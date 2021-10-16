@@ -23,7 +23,7 @@ class VideoTrimmerViewController: AssetSelectionViewController {
     var player: AVPlayer?
     var playbackTimeCheckerTimer: Timer?
     var trimmerPositionChangedTimer: Timer?
-
+    var duration: Double = 1
     override func viewDidLoad() {
         super.viewDidLoad()
         trimmerView.handleColor = UIColor.white
@@ -48,9 +48,10 @@ class VideoTrimmerViewController: AssetSelectionViewController {
     }
 
     override func loadAsset(_ asset: AVAsset) {
-
+        trimmerView.maxDuration = duration * 4
         trimmerView.asset = asset
         trimmerView.delegate = self
+        trimmerView.minDuration = duration
         addVideoPlayer(with: asset, playerView: playerView)
     }
 

@@ -188,7 +188,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     private func setupPositionBar() {
 
         positionBar.frame = CGRect(x: 0, y: 0, width: 3, height: frame.height)
-        positionBar.backgroundColor = positionBarColor
+        positionBar.backgroundColor = .clear
         positionBar.center = CGPoint(x: leftHandleView.frame.maxX, y: center.y)
         positionBar.layer.cornerRadius = 1
         positionBar.translatesAutoresizingMaskIntoConstraints = false
@@ -203,7 +203,6 @@ public protocol TrimmerViewDelegate: AnyObject {
     }
 
     private func setupGestures() {
-
         let leftPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
         let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
@@ -225,31 +224,20 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard let view = gestureRecognizer.view, let superView = gestureRecognizer.view?.superview else { return }
-        let isLeftGesture = view == leftHandleView
         switch gestureRecognizer.state {
-
         case .began:
-            if isLeftGesture {
-                currentLeftConstraint = leftConstraint!.constant
-            } else {
-                currentRightConstraint = rightConstraint!.constant
-            }
+            currentLeftConstraint = leftConstraint!.constant
+            currentRightConstraint = rightConstraint!.constant
             updateSelectedTime(stoppedMoving: false)
         case .changed:
             let translation = gestureRecognizer.translation(in: superView)
-            if isLeftGesture {
-                updateLeftConstraint(with: translation)
-            } else {
-                updateRightConstraint(with: translation)
-            }
+            updateLeftConstraint(with: translation)
+            updateRightConstraint(with: translation)
             layoutIfNeeded()
-            if let startTime = startTime, isLeftGesture {
+            if let startTime = startTime {
                 seek(to: startTime)
-            } else if let endTime = endTime {
-                seek(to: endTime)
             }
             updateSelectedTime(stoppedMoving: false)
-
         case .cancelled, .ended, .failed:
             updateSelectedTime(stoppedMoving: true)
         default: break
@@ -277,7 +265,8 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     private func resetHandleViewPosition() {
         leftConstraint?.constant = 0
-        rightConstraint?.constant = 0
+        let space = (frame.width - minimumDistanceBetweenHandle) - frame.width
+        rightConstraint?.constant = space
         layoutIfNeeded()
     }
 
