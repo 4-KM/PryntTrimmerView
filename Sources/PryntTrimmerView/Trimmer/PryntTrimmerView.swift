@@ -266,6 +266,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     private func resetHandleViewPosition() {
         leftConstraint?.constant = 0
         let space = (frame.width - minimumDistanceBetweenHandle) - frame.width
+        print(frame.width, minimumDistanceBetweenHandle, space)
         rightConstraint?.constant = space
         layoutIfNeeded()
     }
